@@ -8,21 +8,27 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Chat
+namespace ChatClient
 {
     public partial class Form1 : Form
     {
-        Server server;
+        private NetManager netManager = null;
         public Form1()
         {
             InitializeComponent();
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            netManager = new NetManager();
+
+            netManager.Init();
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            button1.Enabled = false;
-            server = new Server();
-            
+
+            netManager.Send("the time is" + DateTime.Now);
         }
     }
 }

@@ -7,10 +7,11 @@ using System.Net.Sockets;
 using System.Net;
 using Common;
 
-namespace ChatClient
+namespace ChatClient.Manager
 {
     class NetManager : Manager
-    {
+    { 
+        private WindowManager m_windowManager = null;
         private Socket m_client = null;
         private IPEndPoint m_iPEndPoint = null;
 
@@ -18,10 +19,17 @@ namespace ChatClient
         byte[] msg = new byte[1024];
 
         bool m_bConnectd = false;
-        public NetManager()
+        private NetManager()
         {
             m_client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); 
             m_iPEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0720);
+
+            m_windowManager = WindowManager.GetWindowManager();
+        }
+        private static NetManager netManager = new NetManager();
+        public static NetManager GetNetManager()
+        {
+            return netManager;
         }
         public override void Init()
         {
@@ -44,7 +52,7 @@ namespace ChatClient
         {
             m_client.BeginReceive(msg, 0, 1024, SocketFlags.None, ReceiveHandle, null);
 
-            Send(Request.Chat,"hello server");
+            //Send(Request.Chat,"hello server");
         }
         public void Send(Request requestCode, string data)
         {
@@ -63,7 +71,24 @@ namespace ChatClient
         private void ReceiveHandle(IAsyncResult ar)
         {
             int count = m_client.EndReceive(ar);
-            
+
+            int sum = BitConverter.ToInt32(msg, 0);
+            Response res = (Response)BitConverter.ToInt32(msg, 4);
+            string data = Encoding.UTF8.GetString(msg, 8, sum - 4);
+
+            if(res == Response.Login)
+            {
+                m_windowManager.m_phase = Phase.LoginCheckOver;
+                if (data == "1")     // login success
+                {
+                    m_windowManager.M_bLoginSuccess = true;
+                }
+                else                // login fail
+                {
+                    m_windowManager.M_bLoginFail = true;
+                }
+            }
+
             m_client.BeginReceive(msg, 0, 1024, SocketFlags.None, ReceiveHandle, null);
             
         }

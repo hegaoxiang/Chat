@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using ChatClient.Manager;
+using Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,9 @@ namespace ChatClient
 {
     public partial class Form1 : Form
     {
-        private NetManager netManager = null;
+        private NetManager m_netManager = null;
+        private WindowManager m_windowManager = null;
+        private Form2 form2 = null;
         public Form1()
         {
             InitializeComponent();
@@ -21,17 +24,66 @@ namespace ChatClient
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            netManager = new NetManager();
+            m_netManager = NetManager.GetNetManager();
+            m_windowManager = WindowManager.GetWindowManager();
 
-            netManager.Init();
+            m_netManager.Init();
+            m_windowManager.Init();
         }
 
         private void m_btnLogin_Click(object sender, EventArgs e)
         {
             string username = m_userInput.Text;
             string password = m_passInput.Text;
-           
-            netManager.Send(Request.Login, username + "," + password);
+
+            m_netManager.Send(Request.Login, username + "," + password);
+
+            m_windowManager.m_phase = Phase.LoginCheck;
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            switch(m_windowManager.m_phase)
+            {
+                case Phase.LoginCheck:
+                    {
+                        break;
+                    }
+                case Phase.LoginInput:
+                    {
+                        break;
+                    }
+                case Phase.LoginCheckOver:
+                    {
+                        if(m_windowManager.M_bLoginSuccess)
+                        {
+                            form2 =  new Form2();
+
+                            form2.Visible = true;
+                            this.Visible = false;
+
+                            m_windowManager.m_phase = Phase.LoginInput;
+                        }
+                        else
+                        {
+                            m_panelLoginInfo.Visible = true;
+                           
+                        }
+                        break;
+                    }
+                default:
+                    break;
+            }
         }
     }
 }

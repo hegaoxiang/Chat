@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatClient
+namespace ChatClient.Manager
 {
-    abstract class Manager
+     abstract class Manager
     {
         public abstract void Init();
     }

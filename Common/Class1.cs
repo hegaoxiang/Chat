@@ -9,12 +9,13 @@ namespace Common
     public enum Request
     {
         Login,
-        Chat
-
+        Chat,
+        LoadFriend
     }
     public enum Response
     {
         Login,
-        Chat
+        Chat,
+        LoadFriend
     }
 }

@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using Chat.Model;
+using Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +11,17 @@ namespace Chat
 {
     class Client
     {
+        public User m_user = null;
+        public Server m_server = null;
         public Socket m_client = null;
         //test msg
         public byte[] msg = new byte[1024];
 
-        public Client(Socket clientSocket)
+        public Client(Socket clientSocket,Server server)
         {
             m_client = clientSocket;
+            m_server = server;
+            
             Init();
         }
         ~Client()
@@ -24,9 +29,17 @@ namespace Chat
             m_client.Close();
         }
         //send msg to client
-        public void  Send(string msg)
+        public void  Send(Response responseCode, string data)
         {
-            m_client.Send(Encoding.UTF8.GetBytes(msg));                                    
+            byte[] responseCodeBytes = BitConverter.GetBytes((int)responseCode);
+            byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+            byte[] lengthBytes = BitConverter.GetBytes(responseCodeBytes.Length + dataBytes.Length);
+
+
+            byte[] msgBytes = lengthBytes.Concat(responseCodeBytes)
+            .Concat(dataBytes).ToArray<byte>();
+
+            m_client.Send(msgBytes);                                    
         }
 
         public void Init()
@@ -45,7 +58,16 @@ namespace Chat
 
                 if (req == Request.Login)
                 {
-                    string[] userInfo = data.Split(',');
+                    string[] userInfo = data.Split(',');                    // splitting the byte stream to get the userful infomation
+                    m_user = m_server.LoginCheck(userInfo[0], userInfo[1]);
+                    if (m_user != null) // login success
+                    {
+                        Send(Response.Login, "1");
+                    }
+                    else                // login failed
+                    {
+                        Send(Response.Login, "0");
+                    }
                 }
                 
                 m_client.BeginReceive(msg, 0, 1024, SocketFlags.None, ReceiveCallBack, null);

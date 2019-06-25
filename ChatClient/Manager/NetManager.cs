@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using Common;
 
 namespace ChatClient
 {
@@ -43,18 +44,26 @@ namespace ChatClient
         {
             m_client.BeginReceive(msg, 0, 1024, SocketFlags.None, ReceiveHandle, null);
 
-            Send("hello server");
+            Send(Request.Chat,"hello server");
         }
-        public void Send(string msg)
+        public void Send(Request requestCode, string data)
         {
             while (m_bConnectd == false)
                 Init();
-            m_client.Send(Encoding.UTF8.GetBytes(msg));
+            byte[] requestCodeBytes = BitConverter.GetBytes((int)requestCode);
+            byte[] dataBytes = Encoding.UTF8.GetBytes(data);
+            byte[] lengthBytes = BitConverter.GetBytes(requestCodeBytes.Length + dataBytes.Length);
+
+
+            byte[] msgBytes =  lengthBytes.Concat(requestCodeBytes)
+            .Concat(dataBytes).ToArray<byte>();      
+            
+            m_client.Send(msgBytes);
         }
         private void ReceiveHandle(IAsyncResult ar)
         {
             int count = m_client.EndReceive(ar);
-            string receiveMsg = Encoding.UTF8.GetString(msg, 0, count);
+            
             m_client.BeginReceive(msg, 0, 1024, SocketFlags.None, ReceiveHandle, null);
             
         }

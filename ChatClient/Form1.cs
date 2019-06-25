@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -25,10 +26,12 @@ namespace ChatClient
             netManager.Init();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void m_btnLogin_Click(object sender, EventArgs e)
         {
-
-            netManager.Send("the time is" + DateTime.Now);
+            string username = m_userInput.Text;
+            string password = m_passInput.Text;
+           
+            netManager.Send(Request.Login, username + "," + password);
         }
     }
 }

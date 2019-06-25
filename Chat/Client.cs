@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -38,8 +39,15 @@ namespace Chat
             try
             {
                 int count = m_client.EndReceive(ar);
+                int sum = BitConverter.ToInt32(msg, 0);
+                Request req = (Request)BitConverter.ToInt32(msg, 4);
+                string data = Encoding.UTF8.GetString(msg, 8, sum - 4);
+
+                if (req == Request.Login)
+                {
+                    string[] userInfo = data.Split(',');
+                }
                 
-                string receiveMsg = Encoding.UTF8.GetString(msg, 0, count);
                 m_client.BeginReceive(msg, 0, 1024, SocketFlags.None, ReceiveCallBack, null);
             }catch(Exception e)
             {

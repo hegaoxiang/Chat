@@ -27,5 +27,9 @@ namespace Chat.Model
             }
             return false;
         }
+        public override string ToString()
+        {
+            return Id.ToString()+ "," + Username  + ","+ Password;
+        }
     }
 }

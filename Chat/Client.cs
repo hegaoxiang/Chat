@@ -56,19 +56,39 @@ namespace Chat
                 Request req = (Request)BitConverter.ToInt32(msg, 4);
                 string data = Encoding.UTF8.GetString(msg, 8, sum - 4);
 
-                if (req == Request.Login)
+                switch (req)
                 {
-                    string[] userInfo = data.Split(',');                    // splitting the byte stream to get the userful infomation
-                    m_user = m_server.LoginCheck(userInfo[0], userInfo[1]);
-                    if (m_user != null) // login success
-                    {
-                        Send(Response.Login, "1");
-                    }
-                    else                // login failed
-                    {
-                        Send(Response.Login, "0");
-                    }
+                    case Request.Login:
+                        {                            
+                            string[] userInfo = data.Split(',');                    // splitting the byte stream to get the userful infomation
+                            m_user = m_server.LoginCheck(userInfo[0], userInfo[1]);
+                            if (m_user != null) // login success
+                            {
+                                Send(Response.Login, "1");
+                            }
+                            else                // login failed
+                            {
+                                Send(Response.Login, "0");
+                            }
+                            break;
+                        }
+                    case Request.LoadFriend:
+                        {
+                            List<User> users = m_server.LoadFriends(m_user.Id);
+                            if(users != null)
+                            {
+                                foreach (var item in users)
+                                {
+                                    Send(Response.LoadFriend, item.ToString());
+                                }
+                            }                            
+                            break;                    
+                        }
+                    default:
+                        break;
+
                 }
+
                 
                 m_client.BeginReceive(msg, 0, 1024, SocketFlags.None, ReceiveCallBack, null);
             }catch(Exception e)

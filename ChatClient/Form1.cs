@@ -38,7 +38,7 @@ namespace ChatClient
 
             m_netManager.Send(Request.Login, username + "," + password);
 
-            m_windowManager.m_phase = Phase.LoginCheck;
+           // m_windowManager.m_phase = Phase.LoginCheck;
         }
 
         private void label3_Click(object sender, EventArgs e)

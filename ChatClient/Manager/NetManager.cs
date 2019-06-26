@@ -42,7 +42,7 @@ namespace ChatClient.Manager
             }
             catch(Exception e)
             {
-                Console.WriteLine(e);
+               
                 m_bConnectd = false;
             }  
 
@@ -75,20 +75,32 @@ namespace ChatClient.Manager
             int sum = BitConverter.ToInt32(msg, 0);
             Response res = (Response)BitConverter.ToInt32(msg, 4);
             string data = Encoding.UTF8.GetString(msg, 8, sum - 4);
+            string datas = Encoding.UTF8.GetString(msg, 8, count - 4);
 
-            if(res == Response.Login)
+            switch (res)
             {
-                m_windowManager.m_phase = Phase.LoginCheckOver;
-                if (data == "1")     // login success
-                {
-                    m_windowManager.M_bLoginSuccess = true;
-                }
-                else                // login fail
-                {
-                    m_windowManager.M_bLoginFail = true;
-                }
+                case Response.Login:
+                    {
+                        m_windowManager.m_phase = Phase.LoginCheckOver;
+                        if (data == "1")     // login success
+                        {
+                            m_windowManager.M_bLoginSuccess = true;
+                        }
+                        else                // login fail
+                        {
+                            m_windowManager.M_bLoginFail = true;
+                        }
+                        break;
+                    }
+                case Response.LoadFriend:
+                    {
+                        m_windowManager.friends.Add(new Friend(data));
+                        m_windowManager.m_phase = Phase.LoadFriend;
+                        break;
+                    }
+                default:
+                    break;
             }
-
             m_client.BeginReceive(msg, 0, 1024, SocketFlags.None, ReceiveHandle, null);
             
         }

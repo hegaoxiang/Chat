@@ -42,17 +42,21 @@ namespace Chat
         {
             Socket clientSocket = m_server.EndAccept(ar);                                     // get a new connected socket
             Client client = new Client(clientSocket,this);
-            client.Send(Response.Chat,"HELLO CLIENT");                                                      // send it something        
+            //client.Send(Response.Chat,"HELLO CLIENT");                                                      // send it something        
             m_server.BeginAccept(AcceptCallBack, null);
         }
 
-        /// summary
+        /// <summary>
         /// client interaction
-        /// summary
+        /// </summary>      
         public User LoginCheck(string username,string password)
         {
             return database.QueryUser(username,password);
         }
 
+        public List<User> LoadFriends(int id)
+        {
+            return database.QueryFriends(id);
+        }
     }
 }

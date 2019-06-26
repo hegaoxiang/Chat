@@ -11,12 +11,14 @@ namespace ChatClient.Manager
         LoginInput,
         LoginCheck,
         LoginCheckOver,
+        LoadFriend
     }
     class WindowManager : Manager
     {
         public Phase m_phase = Phase.LoginInput;
         public bool M_bLoginSuccess { get; set; }
         public bool M_bLoginFail  { get; set; }
+        public List<Friend> friends = new List<Friend>();
 
         private WindowManager()
         {
